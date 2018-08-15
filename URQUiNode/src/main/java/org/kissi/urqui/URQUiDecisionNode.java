@@ -66,8 +66,8 @@ public class URQUiDecisionNode extends AbstractDecisionNode {
     public Action process(TreeContext context) throws NodeProcessException {
         logger.debug("URQUiDecisionNode started");
 
-        String username = context.sharedState.get(USERNAME).toString();
-        String urqui = context.transientState.get("URQUI").toString();
+        String username = context.sharedState.get(USERNAME).asString();
+        String urqui = context.transientState.get("URQUI").asString();
         logger.debug("authenticating {} ", username);
         boolean isActive;
         try {
