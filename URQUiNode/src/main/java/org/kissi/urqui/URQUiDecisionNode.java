@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import javax.net.ssl.HttpsURLConnection;
 import java.net.URL;
 import javax.inject.Inject;
 import org.forgerock.openam.auth.node.api.*;
@@ -70,22 +71,24 @@ public class URQUiDecisionNode extends AbstractDecisionNode {
         String urqui = context.transientState.get("URQUI").asString();
         logger.debug("authenticating {} ", username);
         boolean isActive;
+       
         try {
             isActive = coreWrapper.getIdentity(username, context.sharedState.get(REALM).asString()).isActive();
         } catch (IdRepoException | SSOException e) {
             throw new NodeProcessException(e);
         }
+ 
         return goTo(validateUrqui(username, urqui) && isActive).build();
     }
 
 
     private boolean validateUrqui(String username, String urqui) {
-        //  String rqui = x.getName();
-        //   String urqui = "536028";
-
+        //  String  = x.getName();
+         
+ 
         try {
             String result = sendPost(username + urqui);
- 
+  
             if (result.substring(14, 16).equals("ok")) {
 
                 return true;
@@ -107,16 +110,18 @@ public class URQUiDecisionNode extends AbstractDecisionNode {
     private static String sendPost(String ciphertext) throws Exception {
 
         final String USER_AGENT = "Mozilla/5.0";
-        final String url = "http://urqui.net/validate/hostValidate2.cgi";
+        final String url = "https://validate.urqui.net";
 
         int len = ciphertext.length();
-
+ 
         URL obj = new URL(url);
 
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+       // HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-        // HttpsURLConnection  con = (HttpsURLConnection) obj.openConnection();
-        //  con.setSSLSocketFactory(new UrquiSSL("/urquinetCA.crt").mySocketFactory());
+        HttpsURLConnection  con = (HttpsURLConnection) obj.openConnection();
+          con.setSSLSocketFactory(new UrquiSSL("/valurquinetCA.crt").mySocketFactory());
+          
+         
         //add reuqest header
         con.setRequestMethod("POST");
         con.setRequestProperty("User-Agent", USER_AGENT);
