@@ -46,7 +46,7 @@ public class RQUiCollectorNode extends SingleOutcomeNode {
     interface Config {
     }
 
-    private static final String BUNDLE = "org/forgerock/openam/auth/nodes/RQUiCollectorNode";
+    private static final String BUNDLE = "org/kissi/urqui/RQUiCollectorNode";
     private final Logger logger = LoggerFactory.getLogger("amAuth");
 
     @Override
