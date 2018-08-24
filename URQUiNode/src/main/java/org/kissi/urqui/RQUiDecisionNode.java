@@ -31,18 +31,18 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * A node that decides if the username and password exists in the data store.
+ * A node that decides if the RQUi is on the user profile.
  *
  * <p>
  * Expects 'username' and 'password' fields to be present in the shared
  * state.</p>
  */
 @Node.Metadata(outcomeProvider = AbstractDecisionNode.OutcomeProvider.class,
-        configClass = URQUiRQUiDecisionNode.Config.class)
-public class URQUiRQUiDecisionNode extends AbstractDecisionNode {
+        configClass = RQUiDecisionNode.Config.class)
+public class RQUiDecisionNode extends AbstractDecisionNode {
 
     /**
-     * Configuration for the data store node.
+     * Configuration for the RQUi decision node
      */
     interface Config {
 
@@ -60,31 +60,29 @@ public class URQUiRQUiDecisionNode extends AbstractDecisionNode {
      * @param coreWrapper A core wrapper instance.
      */
     @Inject
-    public URQUiRQUiDecisionNode(@Assisted Config config, CoreWrapper coreWrapper) {
+    public RQUiDecisionNode(@Assisted Config config, CoreWrapper coreWrapper) {
         this.config = config;
         this.coreWrapper = coreWrapper;
     }
 
     @Override
-    public Action process(TreeContext context) throws NodeProcessException {
-        logger.debug("URQUiRQUiDecisionNode started");
+    public Action process(TreeContext context) {
+        logger.debug("RQUiDecisionNode started");
 
         config.rquiAttributeName();
-        
+
         Set<String> a = new HashSet<>();
         a.add(config.rquiAttributeName());
         Map attrs = null;
         try {
             attrs = coreWrapper.getIdentity(context.sharedState.get(USERNAME).asString(), context.sharedState.get
                     (REALM).asString()).getAttributes(a);
-        } catch (IdRepoException e) {
-            e.printStackTrace();
-        } catch (SSOException e) {
+        } catch (IdRepoException | SSOException e) {
             e.printStackTrace();
         }
-        HashSet<String> attributeSet = (HashSet) attrs.get(config.rquiAttributeName());
+        Set attributeSet = (Set) attrs.get(config.rquiAttributeName());
 
-       return goTo(attributeSet.isEmpty()).build();
+       return goTo(!attributeSet.isEmpty()).build();
        
     }
 }
