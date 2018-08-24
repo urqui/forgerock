@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * A node that decides if the RQUi exists in the data store.
+ * A node that decides if the username and password exists in the data store.
  *
  * <p>
  * Expects 'username' and 'password' fields to be present in the shared
@@ -70,7 +70,7 @@ public class URQUiRQUiDecisionNode extends AbstractDecisionNode {
         logger.debug("URQUiRQUiDecisionNode started");
 
         config.rquiAttributeName();
-
+        
         Set<String> a = new HashSet<>();
         a.add(config.rquiAttributeName());
         Map attrs = null;
@@ -84,21 +84,7 @@ public class URQUiRQUiDecisionNode extends AbstractDecisionNode {
         }
         HashSet<String> attributeSet = (HashSet) attrs.get(config.rquiAttributeName());
 
-        goTo(true).build();
-
-<<<<<<< HEAD
-goTo(false).build()
-
-
-
-=======
-        goTo(false).build();
-        
-        
- 
->>>>>>> 1107d9c11a9bfd6fa1a8966cb260fa0b7e09d7b0
-        return goTo(validateUrqui(username, urqui) && isActive).build();
+       return goTo(attributeSet.isEmpty()).build();
+       
     }
-
-
 }
