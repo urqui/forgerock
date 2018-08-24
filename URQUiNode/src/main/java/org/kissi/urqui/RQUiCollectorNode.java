@@ -32,26 +32,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A node which collects a username from the user via a name callback.
+ * A node which collects a RQUi from the user via a name callback.
  *
  * <p>Places the result in the shared state as 'username'.</p>
  */
 @Node.Metadata(outcomeProvider = SingleOutcomeNode.OutcomeProvider.class,
-            configClass = URQUiRQUiCollectorNode.Config.class)
-public class URQUiRQUiCollectorNode extends SingleOutcomeNode {
+            configClass = RQUiCollectorNode.Config.class)
+public class RQUiCollectorNode extends SingleOutcomeNode {
 
     /**
-     * Configuration for the username collector node.
+     * Configuration for the RQUi collector node.
      */
-    public interface Config {
+    interface Config {
     }
 
-    private static final String BUNDLE = "org/forgerock/openam/auth/nodes/URQUiRQUiCollectorNode";
+    private static final String BUNDLE = "org/forgerock/openam/auth/nodes/RQUiCollectorNode";
     private final Logger logger = LoggerFactory.getLogger("amAuth");
 
     @Override
     public Action process(TreeContext context) {
-        logger.debug("URQUiRQUiCollectorNode started");
+        logger.debug("RQUiCollectorNode started");
         JsonValue sharedState = context.sharedState;
         return context.getCallback(NameCallback.class)
                 .map(NameCallback::getName)
