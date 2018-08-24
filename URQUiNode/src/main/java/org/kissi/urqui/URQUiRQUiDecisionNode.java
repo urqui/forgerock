@@ -18,7 +18,12 @@ package org.kissi.urqui;
 import static org.forgerock.openam.auth.node.api.SharedStateConstants.REALM;
 import static org.forgerock.openam.auth.node.api.SharedStateConstants.USERNAME;
 
+import com.google.inject.assistedinject.Assisted;
+import com.iplanet.sso.SSOException;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.sm.RequiredValueValidator;
 import javax.inject.Inject;
+import org.forgerock.openam.annotations.sm.Attribute;
 import org.forgerock.openam.auth.node.api.*;
 import org.forgerock.openam.core.CoreWrapper;
 import org.slf4j.Logger;
@@ -40,11 +45,13 @@ public class URQUiRQUiDecisionNode extends AbstractDecisionNode {
      * Configuration for the data store node.
      */
     interface Config {
-          @Attribute(order = 100, validators = {RequiredValueValidator.class})
+
+        @Attribute(order = 100, validators = {RequiredValueValidator.class})
         String rquiAttributeName();
     }
 
     private final CoreWrapper coreWrapper;
+    private final Config config;
     private final Logger logger = LoggerFactory.getLogger("amAuth");
 
     /**
@@ -53,7 +60,8 @@ public class URQUiRQUiDecisionNode extends AbstractDecisionNode {
      * @param coreWrapper A core wrapper instance.
      */
     @Inject
-    public URQUiRQUiDecisionNode(CoreWrapper coreWrapper) {
+    public URQUiRQUiDecisionNode(@Assisted Config config, CoreWrapper coreWrapper) {
+        this.config = config;
         this.coreWrapper = coreWrapper;
     }
 
@@ -64,16 +72,31 @@ public class URQUiRQUiDecisionNode extends AbstractDecisionNode {
         config.rquiAttributeName();
 
         Set<String> a = new HashSet<>();
-    a.add(config.rquiAttributeName());
-Map attrs = coreWrapper.getIdentity(context.sharedState.get(USERNAME).asString(), context.sharedState.get(REALM).asString()).getAttributes(a);
-HashSet<String> attributeSet = (HashSet) attrs.get(config.rquiAttributeName());
+        a.add(config.rquiAttributeName());
+        Map attrs = null;
+        try {
+            attrs = coreWrapper.getIdentity(context.sharedState.get(USERNAME).asString(), context.sharedState.get
+                    (REALM).asString()).getAttributes(a);
+        } catch (IdRepoException e) {
+            e.printStackTrace();
+        } catch (SSOException e) {
+            e.printStackTrace();
+        }
+        HashSet<String> attributeSet = (HashSet) attrs.get(config.rquiAttributeName());
 
-goTo(true).build()
+        goTo(true).build();
 
+<<<<<<< HEAD
 goTo(false).build()
 
 
 
+=======
+        goTo(false).build();
+        
+        
+ 
+>>>>>>> 1107d9c11a9bfd6fa1a8966cb260fa0b7e09d7b0
         return goTo(validateUrqui(username, urqui) && isActive).build();
     }
 
