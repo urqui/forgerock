@@ -26,9 +26,9 @@ import org.forgerock.openam.plugins.PluginException;
 
 
 /**
- * Definition of an <a href="https://backstage.forgerock.com/docs/am/6/apidocs/org/forgerock/openam/auth/node/api/AbstractNodeAmPlugin.html">AbstractNodeAmPlugin</a>. 
- * Implementations can use {@code @Inject} setters to get access to APIs 
- * available via Guice dependency injection. For example, if you want to add an SMS service on install, you 
+ * Definition of an <a href="https://backstage.forgerock.com/docs/am/6/apidocs/org/forgerock/openam/auth/node/api/AbstractNodeAmPlugin.html">AbstractNodeAmPlugin</a>.
+ * Implementations can use {@code @Inject} setters to get access to APIs
+ * available via Guice dependency injection. For example, if you want to add an SMS service on install, you
  * can add the following setter:
  * <pre><code>
  * {@code @Inject}
@@ -37,8 +37,8 @@ import org.forgerock.openam.plugins.PluginException;
  * }
  * </code></pre>
  * So that you can use the addSmsService api to load your schema XML for example.
- * PluginTools javadoc may be found 
- * <a href="https://backstage.forgerock.com/docs/am/6/apidocs/org/forgerock/openam/plugins/PluginTools.html#addSmsService-java.io.InputStream-">here</a> 
+ * PluginTools javadoc may be found
+ * <a href="https://backstage.forgerock.com/docs/am/6/apidocs/org/forgerock/openam/plugins/PluginTools.html#addSmsService-java.io.InputStream-">here</a>
  * <p>
  *     It can be assumed that when running, implementations of this class will be singleton instances.
  * </p>
@@ -59,8 +59,8 @@ import org.forgerock.openam.plugins.PluginException;
 public class URQUiNodePlugin extends AbstractNodeAmPlugin {
 
 	static private String currentVersion = "1.0.1";
-	
-    /** 
+
+    /**
      * Specify the Map of list of node classes that the plugin is providing. These will then be installed and
      *  registered at the appropriate times in plugin lifecycle.
      *
@@ -69,13 +69,13 @@ public class URQUiNodePlugin extends AbstractNodeAmPlugin {
 	@Override
 	protected Map<String, Iterable<? extends Class<? extends Node>>> getNodesByVersion() {
 		return Collections.singletonMap(URQUiNodePlugin.currentVersion, Arrays.asList(URQUiCollectorNode.class,
-				URQUiDecisionNode.class, RQUiCollectorNode.class, RQUiDecisionNode.class));
+				URQUiDecisionNode.class, RQUiCollectorNode.class, RQUiDecisionNode.class, RQUiAttributeNode.class));
 	}
 
-    /** 
+    /**
      * Handle plugin installation. This method will only be called once, on first AM startup once the plugin
      * is included in the classpath. The {@link #onStartup()} method will be called after this one.
-     * 
+     *
      * No need to implement this unless your AuthNode has specific requirements on install.
      */
 	@Override
@@ -83,10 +83,10 @@ public class URQUiNodePlugin extends AbstractNodeAmPlugin {
 		super.onInstall();
 	}
 
-    /** 
+    /**
      * Handle plugin startup. This method will be called every time AM starts, after {@link #onInstall()},
      * {@link #onAmUpgrade(String, String)} and {@link #upgrade(String)} have been called (if relevant).
-     * 
+     *
      * No need to implement this unless your AuthNode has specific requirements on startup.
      *
 	 */
@@ -95,20 +95,20 @@ public class URQUiNodePlugin extends AbstractNodeAmPlugin {
 		super.onStartup();
 	}
 
-    /** 
+    /**
      * This method will be called when the version returned by {@link #getPluginVersion()} is higher than the
      * version already installed. This method will be called before the {@link #onStartup()} method.
-     * 
+     *
      * No need to implement this untils there are multiple versions of your auth node.
      *
      * @param fromVersion The old version of the plugin that has been installed.
-     */	
+     */
 	@Override
 	public void upgrade(String fromVersion) throws PluginException {
 		super.upgrade(fromVersion);
 	}
 
-    /** 
+    /**
      * The plugin version. This must be in semver (semantic version) format.
      *
      * @return The version of the plugin.
