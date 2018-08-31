@@ -66,21 +66,16 @@ public class RQUiDecisionNode extends AbstractDecisionNode {
     }
 
     @Override
-    public Action process(TreeContext context) {
+    public Action process(TreeContext context) throws NodeProcessException {
         logger.debug("RQUiDecisionNode started");
 
-        config.rquiAttributeName();
-
-        Set<String> a = new HashSet<>();
-        a.add(config.rquiAttributeName());
-        Map attrs = null;
+        Set<String> attributeSet;
         try {
-            attrs = coreWrapper.getIdentity(context.sharedState.get(USERNAME).asString(), context.sharedState.get
-                    (REALM).asString()).getAttributes(a);
+            attributeSet = coreWrapper.getIdentity(context.sharedState.get(USERNAME).asString(), context.sharedState.get
+                    (REALM).asString()).getAttribute(config.rquiAttributeName());
         } catch (IdRepoException | SSOException e) {
-            e.printStackTrace();
+            throw new NodeProcessException(e);
         }
-        Set attributeSet = (Set) attrs.get(config.rquiAttributeName());
 
        return goTo(!attributeSet.isEmpty()).build();
        
