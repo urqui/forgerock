@@ -18,15 +18,23 @@ package org.kissi.urqui;
 import static org.forgerock.openam.auth.node.api.SharedStateConstants.REALM;
 import static org.forgerock.openam.auth.node.api.SharedStateConstants.USERNAME;
 
+import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
-import com.sun.identity.authentication.spi.InvalidPasswordException;
+import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.sm.RequiredValueValidator;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.net.ssl.HttpsURLConnection;
+import org.forgerock.openam.annotations.sm.Attribute;
 import org.forgerock.openam.auth.node.api.*;
 import org.forgerock.openam.core.CoreWrapper;
 import org.slf4j.Logger;
@@ -47,8 +55,12 @@ public class URQUiDecisionNode extends AbstractDecisionNode {
      * Configuration for the data store node.
      */
     interface Config {
+
+        @Attribute(order = 100, validators = {RequiredValueValidator.class})
+        String rquiAttributeName();
     }
 
+    private Config config;
     private final CoreWrapper coreWrapper;
     private final Logger logger = LoggerFactory.getLogger("amAuth");
 
@@ -58,103 +70,71 @@ public class URQUiDecisionNode extends AbstractDecisionNode {
      * @param coreWrapper A core wrapper instance.
      */
     @Inject
-    public URQUiDecisionNode(CoreWrapper coreWrapper) {
+    public URQUiDecisionNode(@Assisted Config config, CoreWrapper coreWrapper) {
+        this.config = config;
         this.coreWrapper = coreWrapper;
     }
 
     @Override
     public Action process(TreeContext context) throws NodeProcessException {
+
         logger.debug("URQUiDecisionNode started");
 
         String username = context.sharedState.get(USERNAME).asString();
         String urqui = context.transientState.get("URQUI").asString();
         logger.debug("authenticating {} ", username);
         boolean isActive;
-       
+        Set<String> attrs;
         try {
-            isActive = coreWrapper.getIdentity(username, context.sharedState.get(REALM).asString()).isActive();
+            AMIdentity identity = coreWrapper.getIdentity(username, context.sharedState.get(REALM).asString());
+            attrs = identity.getAttribute(config.rquiAttributeName());
+            isActive = identity.isActive();
         } catch (IdRepoException | SSOException e) {
             throw new NodeProcessException(e);
         }
- 
-        return goTo(validateUrqui(username, urqui) && isActive).build();
+
+        try {
+            return goTo(validateUrqui(attrs.iterator().next(), urqui) && isActive).build();
+        } catch (CertificateException | NoSuchAlgorithmException | KeyManagementException | IOException e) {
+           throw new NodeProcessException(e);
+        }
     }
 
 
-    private boolean validateUrqui(String username, String urqui) {
-        //  String  = x.getName();
-         
- 
-        try {
-            String result = sendPost(username + urqui);
-  
-            if (result.substring(14, 16).equals("ok")) {
+    private boolean validateUrqui(String rqui, String urqui) throws CertificateException, NoSuchAlgorithmException,
+            KeyManagementException, IOException {
+        String result;
+        result = sendPost(rqui + urqui);
 
-                return true;
-                
-            } else {
-                throw new InvalidPasswordException(result);
-
-                //   return result.substring(14, 16).equals("ok"); // System.out.println("ok");
-                //  System.out.println("bad");
-            }
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-
-        return false;
+        return result.substring(14, 16).equals("ok");
     }
 
     // HTTP POST request
-    private static String sendPost(String ciphertext) throws Exception {
+    private static String sendPost(String cipherText) throws IOException, CertificateException, NoSuchAlgorithmException, KeyManagementException {
 
-        final String USER_AGENT = "Mozilla/5.0";
-        final String url = "https://validate.urqui.net";
+        HttpsURLConnection con = (HttpsURLConnection) new URL("https://validate.urqui.net").openConnection();
+        con.setSSLSocketFactory(new UrquiSSL("/valurquinetCA.crt").mySocketFactory());
 
-        int len = ciphertext.length();
- 
-        URL obj = new URL(url);
-
-       // HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-        HttpsURLConnection  con = (HttpsURLConnection) obj.openConnection();
-          con.setSSLSocketFactory(new UrquiSSL("/valurquinetCA.crt").mySocketFactory());
-          
-         
-        //add reuqest header
+        //add request header
         con.setRequestMethod("POST");
-        con.setRequestProperty("User-Agent", USER_AGENT);
+        con.setRequestProperty("User-Agent", "Mozilla/5.0");
         con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
         con.setRequestProperty("Content-Type", "application/text");
-        con.setRequestProperty("Content-Length", Integer.toString(len));
+        con.setRequestProperty("Content-Length", Integer.toString(cipherText.length()));
 
-        // combine byte arrays into 1.
-        //  byte[] postData = new byte[len];
-        // copy a to result
-        // System.arraycopy(iv, 0, postData, 0, iv.length);
-        // copy b to result
-        //  System.arraycopy(id, 0, postData, iv.length, id.length);
-        // copy b to result
-        //  System.arraycopy(ciphertext, 0, postData, iv.length + id.length, ciphertext.length);
-        // Send post request
         con.setDoOutput(true);
         try (OutputStream wr = con.getOutputStream()) {
-            wr.write(ciphertext.getBytes());
+            wr.write(cipherText.getBytes());
 
             wr.flush();
         }
 
-        ByteArrayOutputStream bais;
-
-        DataInputStream in = new DataInputStream(con.getInputStream());
         byte[] f = new byte[256];
-        bais = new ByteArrayOutputStream();
         int n;
-        while ((n = in.read(f)) > 0) {
-            bais.write(f, 0, n);
+        while ((n = new DataInputStream(con.getInputStream()).read(f)) > 0) {
+            new ByteArrayOutputStream().write(f, 0, n);
         }
 
-        //   byte[] result = UrquiCommon.hex2bin(bais.toString());
         return new String(f);
     }
 }

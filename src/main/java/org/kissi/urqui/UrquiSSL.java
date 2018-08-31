@@ -5,56 +5,32 @@ package org.kissi.urqui;
  *
  * @author Kinesis Identity Security System Inc. 
  */
-import java.io.IOException;
-import java.io.InputStream;
-
-import java.net.UnknownHostException;
-
-import java.security.InvalidKeyException;
-import java.security.InvalidParameterException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
+import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-public class UrquiSSL {
+class UrquiSSL {
 
     private final SSLContext sc = SSLContext.getInstance("SSL");
 
-    private static X509Certificate loadCA(String certfile) {
-        CertificateFactory certFactory;
-        X509Certificate cert = null;
-        try {
-            certFactory = CertificateFactory.getInstance("X.509");
-
-            InputStream is = UrquiSSL.class.getResourceAsStream(certfile);
-
-            cert = (X509Certificate) certFactory.generateCertificate(is);
-        } catch (CertificateException e) {
-            e.printStackTrace();
-
-        }
-        return cert;
+    private static X509Certificate loadCA(String certFile) throws CertificateException {
+        return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(UrquiSSL.class
+                .getResourceAsStream(certFile));
     }
 
-    public UrquiSSL(String certfile) throws NoSuchAlgorithmException, KeyManagementException, UnknownHostException, IOException {
+    UrquiSSL(String certFile) throws NoSuchAlgorithmException, KeyManagementException, CertificateException {
 
-        final X509Certificate URQUiCA = loadCA(certfile);
+        final X509Certificate URQUiCA = loadCA(certFile);
         
         TrustManager[] trustURQUiCert = new TrustManager[]{
             new X509TrustManager() {
                 public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                     return new X509Certificate[]{URQUiCA};
-                    //				return new X509Certificate[] {};
                 }
 
                 public void checkClientTrusted(
@@ -72,9 +48,7 @@ public class UrquiSSL {
                         throw new CertificateException("InvalidKeyException");
                     } catch (NoSuchAlgorithmException e) {
                         throw new CertificateException("NoSuchAlgorithmException");
-                    } catch (NoSuchProviderException e) {
-                        throw new CertificateException("NoSuchProviderException");
-                    } catch (SignatureException e) {
+                    } catch (NoSuchProviderException | SignatureException e) {
                         throw new CertificateException("NoSuchProviderException");
                     }
                 }
@@ -84,7 +58,7 @@ public class UrquiSSL {
         sc.init(null, trustURQUiCert, new java.security.SecureRandom());
     }
 
-    public SSLSocketFactory mySocketFactory() {
-        return (SSLSocketFactory) sc.getSocketFactory();
+    SSLSocketFactory mySocketFactory() {
+        return sc.getSocketFactory();
     }
 }

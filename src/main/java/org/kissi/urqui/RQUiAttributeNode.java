@@ -20,19 +20,19 @@ import static org.forgerock.openam.auth.node.api.SharedStateConstants.USERNAME;
 
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
+import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.sm.RequiredValueValidator;
-import com.sun.identity.idm.AMIdentity;
-import static com.sun.identity.sm.SMSEntry.bundle;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import javax.inject.Inject;
 import org.forgerock.openam.annotations.sm.Attribute;
 import org.forgerock.openam.auth.node.api.*;
 import org.forgerock.openam.core.CoreWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.*;
-import static org.forgerock.openam.auth.node.api.Action.send;
-import javax.security.auth.callback.NameCallback;
 /**
  * A node that decides if the RQUi is on the user profile.
  *
@@ -40,7 +40,7 @@ import javax.security.auth.callback.NameCallback;
  * Expects 'username' and 'password' fields to be present in the shared
  * state.</p>
  */
-@Node.Metadata(outcomeProvider = AbstractDecisionNode.OutcomeProvider.class,
+@Node.Metadata(outcomeProvider = SingleOutcomeNode.OutcomeProvider.class,
         configClass = RQUiAttributeNode.Config.class)
 public class RQUiAttributeNode extends SingleOutcomeNode {
 
@@ -73,14 +73,14 @@ public class RQUiAttributeNode extends SingleOutcomeNode {
     public Action process(TreeContext context) {
         logger.debug("RQUiAttributeNode started");
 
-        config.rquiAttributeName();
-        AMIdentity userIdentity = coreWrapper.getIdentity(context.sharedState.get(USERNAME).asString(), context.sharedState.get(REALM).asString());
+        AMIdentity userIdentity = coreWrapper.getIdentity(context.sharedState.get(USERNAME).asString(), context
+                .sharedState.get(REALM).asString());
 
-        Map<String, Set> map = new HashMap<String, Set>();
-
-        Set<String> values = new HashSet<String>();
-        values.add("RQUi");
-        map.put(config.rquiAttributeName(), values);
+        Map<String, Set> map = new HashMap<String, Set>() {{
+            put(config.rquiAttributeName(), new HashSet<String>() {{
+                add(context.sharedState.get("RQUi").asString());
+            }});
+        }};
 
         try {
             userIdentity.setAttributes(map);
