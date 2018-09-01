@@ -18,6 +18,8 @@ package org.kissi.urqui;
 
 import static org.forgerock.openam.auth.node.api.Action.send;
 
+import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
 import javax.security.auth.callback.NameCallback;
@@ -63,6 +65,7 @@ public class RQUiCollectorNode extends SingleOutcomeNode {
     private Action collectUsername(TreeContext context) {
         ResourceBundle bundle = context.request.locales.getBundleInPreferredLocale(BUNDLE, getClass().getClassLoader());
         logger.debug("collecting rqui");
-        return send(new NameCallback(bundle.getString("callback.rqui"))).build();
+        return send(Arrays.asList(new NameCallback(bundle.getString("callback.rqui")), new ScriptTextOutputCallback
+                 ("document.getElementById('loginButton_0').value = 'Register'"))).build();
     }
 }
