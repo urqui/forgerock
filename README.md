@@ -1,42 +1,57 @@
-<!--
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
- *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
- *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions copyright [year] [name of copyright owner]".
- *
- * Copyright ${data.get('yyyy')} ForgeRock AS.
--->
-# myCustomAuthNode
+**URQUi**
 
-A simple authentication node for ForgeRock's [Identity Platform][forgerock_platform] 5.5 and above. This node... **SHORT DESCRIPTION HERE**
+URQUi integration for ForgeRock\'s \[Identity
+Platform\]\[forgerock\_platform\] 6.0 and above. This integration
+handles:
 
+1.  Primary or Secondary authentication
 
-Copy the .jar file from the ../target directory into the ../web-container/webapps/openam/WEB-INF/lib directory where AM is deployed.  Restart the web container to pick up the new node.  The node will then appear in the authentication trees components palette.
+2.  RQUi registration.
 
+**Installation**
 
-**USAGE HERE**
+Copy the .jar file from the ../target directory into the
+../web-container/webapps/openam/WEB-INF/lib directory where AM is
+deployed. Restart the web container to pick up the new node. The node
+will then appear in the authentication trees components palette.
 
+**URQUi Configuration**
 
-The code in this repository has binary dependencies that live in the ForgeRock maven repository. Maven can be configured to authenticate to this repository by following the following [ForgeRock Knowledge Base Article](https://backstage.forgerock.com/knowledge/kb/article/a74096897).
+1.  Install the URQUi ("Your Key") mobile phone 'app', which creates a
+    unique URQUi ID. URQUi's mobile 'app' is user installable. URQUi is
+    available from iTunes, BlackBerry World, and Google play. The URQUI
+    app is available from URQUi.com for 'not smart' mobile phones.
 
-**SPECIFIC BUILD INSTRUCTIONS HERE**
+2.  From "Options" menu, generate a random RQUi ("Our Key"). Non
+    confidential.
 
-**SCREENSHOTS ARE GOOD LIKE BELOW**
+**ForgeRock Configuration**
 
-![ScreenShot](./example.png)
+1.  Log into your ForgeRock AM console.
 
-        
-The sample code described herein is provided on an "as is" basis, without warranty of any kind, to the fullest extent permitted by law. ForgeRock does not warrant or guarantee the individual success developers may have in implementing the sample code on their development platforms or in production configurations.
+2.  Create a new Authentication Tree. 
 
-ForgeRock does not warrant, guarantee or make any representations regarding the use, results of use, accuracy, timeliness or completeness of any data or information relating to the sample code. ForgeRock disclaims all warranties, expressed or implied, and in particular, disclaims all warranties of merchantability, and warranties related to the code, or any service or software related thereto.
+![](media/image1.png){width="6.5in" height="3.65625in"}
 
-ForgeRock shall not be liable for any direct, indirect or consequential damages or costs of any type arising out of any action taken by you or others related to the sample code.
+3.  Setup the following configuration for the tree that was just
+    created.
 
-[forgerock_platform]: https://www.forgerock.com/platform/  
+![](media/image2.png){width="6.5in" height="3.65625in"}
+
+**Usage**
+
+1.  Log into the Tree that was created in the steps above by going to
+    /openam/XUI/\#login&service={{Tree\_Name}}.
+
+2.  Log in with your ForgeRock username.
+
+> ![](media/image3.png){width="6.5in" height="3.65625in"}
+
+3.  If first time, then register your RQUi (A) or if you\'ve already
+    registered, enter URQUi to log in(B). 
+
+<!-- -->
+
+A.  ![](media/image4.png){width="6.5in" height="3.65625in"}
+
+B.  ![](media/image5.png){width="6.5in" height="3.65625in"}
