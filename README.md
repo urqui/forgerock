@@ -31,12 +31,12 @@ will then appear in the authentication trees components palette.
 
 2.  Create a new Authentication Tree. 
 
-![](media/image1.png){width="6.5in" height="3.65625in"}
+![](https://github.com/urqui/forgerock/blob/master/images/ForgeRock1.png){width="6.5in" height="3.65625in"}
 
 3.  Setup the following configuration for the tree that was just
     created.
 
-![](media/image2.png){width="6.5in" height="3.65625in"}
+![](https://github.com/urqui/forgerock/blob/master/images/ForgeRock2.png){width="6.5in" height="3.65625in"}
 
 **Usage**
 
@@ -45,13 +45,13 @@ will then appear in the authentication trees components palette.
 
 2.  Log in with your ForgeRock username.
 
-> ![](media/image3.png){width="6.5in" height="3.65625in"}
+> ![](https://github.com/urqui/forgerock/blob/master/images/ForgeRock3.png){width="6.5in" height="3.65625in"}
 
 3.  If first time, then register your RQUi (A) or if you\'ve already
     registered, enter URQUi to log in(B). 
 
 <!-- -->
 
-A.  ![](media/image4.png){width="6.5in" height="3.65625in"}
+A.  ![](https://github.com/urqui/forgerock/blob/master/images/ForgeRock4.png){width="6.5in" height="3.65625in"}
 
-B.  ![](media/image5.png){width="6.5in" height="3.65625in"}
+B.  ![](https://github.com/urqui/forgerock/blob/master/images/ForgeRock5.png){width="6.5in" height="3.65625in"}
