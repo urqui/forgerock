@@ -35,8 +35,9 @@ will then appear in the authentication trees components palette.
 
 3.  Setup the following configuration for the tree that was just
     created. 
+
 	The RQUi is an anonymous (Does not contain identifying information) userid. This allows a user to distribute it,
-	without concern of privacy infringement, and at the same time ensuring only they could be authenticated.
+	without concern of privacy infringement, and at the same time ensuring only they can be authenticated.
 	
 	The URQUi, is the authenticating value (Changing password) that is used to authenticate the user. 
 	
