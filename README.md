@@ -39,7 +39,15 @@ will then appear in the authentication trees components palette.
 	The RQUi is an anonymous (Does not contain identifying information) userid. This allows a user to distribute it,
 	without concern of privacy infringement, and at the same time ensuring only they can be authenticated.
 	
-	The URQUi, is the authenticating value (Changing password) that is used to authenticate the user. 
+	The URQUi, is the authenticating value (Changing password) that is used to authenticate the user.
+	
+	The "RQUi Decison Node", "RQUi Save Attribute Node", and "URQUi Decision Node", all require an Atrribute configured in the Identities DB, to save the users RQUi value. 
+	
+	When a User signs on for the first time and their RQUi attribute is blank("RQUi Decision Node"), the User should be allowed to enter their RQUi("RQUi Collector Node") and have it saved for future use("RQUi Save Attribute Node").
+	
+	Once the Users RQUi as been determined, either by first time entry, or retrieving an existing RQUi from DB, the User can then enter their URQUi(Authenticating Value).
+	
+	The two values together will determine if their access is allowed(URQUi Decision Node).
 	
 ![](https://github.com/urqui/forgerock/blob/master/images/ForgeRock2.png) 
 
