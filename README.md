@@ -45,9 +45,9 @@ will then appear in the authentication trees components palette.
 	
 	When a User signs on for the first time and their RQUi attribute is blank("RQUi Decision Node"), the User should be allowed to enter their RQUi("RQUi Collector Node") and have it saved for future use("RQUi Save Attribute Node").
 	
-	Once the Users RQUi as been determined, either by first time entry, or retrieving an existing RQUi from DB, the User can then enter their URQUi(Authenticating Value).
+	Once the Users RQUi has been determined, either by first time entry, or retrieving an existing RQUi from DB, the User can then enter their URQUi value("URQUi Collector Node").
 	
-	The two values together will determine if their access is allowed(URQUi Decision Node).
+	The two values together will determine if their access is allowed("URQUi Decision Node").
 	
 ![](https://github.com/urqui/forgerock/blob/master/images/ForgeRock2.png) 
 
