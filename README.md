@@ -34,8 +34,12 @@ will then appear in the authentication trees components palette.
 ![](https://github.com/urqui/forgerock/blob/master/images/ForgeRock1.png)  
 
 3.  Setup the following configuration for the tree that was just
-    created.
-
+    created. 
+	The RQUi is an anonymous (Does not contain identifying information) userid. This allows a user to distribute it,
+	without concern of privacy infringement, and at the same time ensuring only they could be authenticated.
+	
+	The URQUi, is the authenticating value (Changing password) that is used to authenticate the user. 
+	
 ![](https://github.com/urqui/forgerock/blob/master/images/ForgeRock2.png) 
 
 **Usage**
