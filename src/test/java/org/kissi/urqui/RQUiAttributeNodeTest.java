@@ -17,7 +17,6 @@
 package org.kissi.urqui;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.forgerock.json.JsonValue.*;
@@ -25,6 +24,7 @@ import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import org.mockito.Mock;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.Enumeration;
@@ -39,7 +39,12 @@ import org.forgerock.openam.auth.node.api.TreeContext;
 import org.forgerock.util.i18n.PreferredLocales;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
+import org.forgerock.openam.core.CoreWrapper;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import org.mockito.InjectMocks;
+import static org.forgerock.openam.auth.node.api.SharedStateConstants.REALM;
+import static org.forgerock.openam.auth.node.api.SharedStateConstants.USERNAME;
 
 
 /**
@@ -50,63 +55,55 @@ import org.testng.annotations.Test;
 
 public class RQUiAttributeNodeTest   {
 
-    private RQUiAttributeNode node;
 
-    @BeforeMethod
-    public void before() {
-        initMocks(this);
-        node = new RQUiAttributeNode();
-    }
 
-    @Test
-    public void testProcessWithNoCallbacksReturnsASingleCallback() {
-        // Given
-        JsonValue sharedState = json(object(field("initial", "initial")));
-        PreferredLocales preferredLocales = mock(PreferredLocales.class);
-        ResourceBundle resourceBundle = new MockResourceBundle("RQUi");
-        given(preferredLocales.getBundleInPreferredLocale(any(), any())).willReturn(resourceBundle);
+	@Mock
+CoreWrapper coreWrapper;
 
-        // When
-        Action result = node.process(getContext(sharedState, preferredLocales, emptyList()));
+@Mock
+AMIdentityRepository identityRepository;
 
-        // Then
-        assertThat(result.outcome).isEqualTo(null);
-        assertThat(result.callbacks).hasSize(2);
-        assertThat(result.callbacks.get(0)).isInstanceOf(NameCallback.class);
-        assertThat(((NameCallback) result.callbacks.get(0)).getPrompt()).isEqualTo("RQUi");
-        assertThat((Object) result.sharedState).isNull();
-        assertThat(sharedState).isObject().containsExactly(entry("initial", "initial"));
-    }
+@Mock
+RQUiAttributeNode.Config config;
 
-    @Test
+@InjectMocks
+RQUiAttributeNode node;
+
+@Mock
+AMIdentity amIdentity;
+
+@BeforeMethod
+public void setup() throws Exception {
+    node = null;
+
+    initMocks(this);
+    given(coreWrapper.convertRealmPathToRealmDn(any())).willReturn("org=name");
+    given(coreWrapper.getAMIdentityRepository(any())).willReturn(identityRepository);
+    given(amIdentity.isActive()).willReturn(true);
+    given(coreWrapper.getIdentity("jonathan", any())).willReturn(amIdentity);
+    given(amIdentity.isActive()).willReturn(true);given(config.rquiAttributeName()).willReturn("theconfigValueYouWant");
+
+
+}
+
+ @Test
     public void testProcessWithCallbacksAddsToState() {
-        JsonValue sharedState = json(object(field("initial", "initial")));
-         
-        assertThat(sharedState).isObject().containsExactly(entry("initial", "initial"));
-		
+
+	// node = new RQUiAttributeNode(config,coreWrapper);
+
+	   JsonValue sharedState = json(object(field("USERNAME", "bob")));
+	  JsonValue transientState = json(object(field("PASSWORD", "secret")));
+
+       Action result = node.process(getContext(sharedState, transientState));
+
+
+		assertThat(result.outcome).isEqualTo("true");
+		assertThat(result.callbacks).isEmpty();
+		assertThat(result.sharedState).isObject().containsExactly(entry(USERNAME, "bob"));
+		assertThat(sharedState).isObject().containsExactly(entry(USERNAME, "bob"));
+		assertThat(transientState).isObject().containsExactly(entry("RQUi", "secret"));
+
     }
 
-    private TreeContext getContext(JsonValue sharedState, PreferredLocales preferredLocales,
-                                   List<? extends Callback> callbacks) {
-        return new TreeContext(sharedState, new Builder().locales(preferredLocales).build(), callbacks);
-    }
-
-    static class MockResourceBundle extends ResourceBundle {
-        private final String value;
-
-        MockResourceBundle(String value) {
-            this.value = value;
-        }
-
-        @Override
-        protected Object handleGetObject(String key) {
-            return value;
-        }
-
-        @Override
-        public Enumeration<String> getKeys() {
-            return null;
-        }
-    }
 }
 
