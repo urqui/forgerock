@@ -25,7 +25,6 @@ import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.Enumeration;
 import java.util.List;
@@ -37,7 +36,6 @@ import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.ExternalRequestContext.Builder;
 import org.forgerock.openam.auth.node.api.TreeContext;
 import org.forgerock.util.i18n.PreferredLocales;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 
@@ -50,17 +48,11 @@ import org.testng.annotations.Test;
 
 public class RQUiCollectorNodeTest   {
 
-    private RQUiCollectorNode node;
-
-    @BeforeMethod
-    public void before() {
-        initMocks(this);
-        node = new RQUiCollectorNode();
-    }
 
     @Test
     public void testProcessWithNoCallbacksReturnsASingleCallback() {
         // Given
+        RQUiCollectorNode node = new RQUiCollectorNode();
         JsonValue sharedState = json(object(field("initial", "initial")));
         PreferredLocales preferredLocales = mock(PreferredLocales.class);
         ResourceBundle resourceBundle = new MockResourceBundle("RQUi");
@@ -80,16 +72,15 @@ public class RQUiCollectorNodeTest   {
 
     @Test
     public void testProcessWithCallbacksAddsToState() {
+        RQUiCollectorNode node = new RQUiCollectorNode();
         JsonValue sharedState = json(object(field("initial", "initial")));
-        NameCallback callback = new NameCallback("prompt");
+        NameCallback callback = new NameCallback("RQUi");
         callback.setName("bob");
         Action result = node.process(getContext(sharedState, new PreferredLocales(), singletonList(callback)));
         assertThat(result.outcome).isEqualTo("outcome");
         assertThat(result.callbacks).isEmpty();
 		
-		assertThat(result.sharedState).isObject().contains("RQUi", "bob").contains("initial", "initial");
-        assertThat(sharedState).isObject().containsExactly(entry("initial", "initial"));
-		
+		assertThat(result.sharedState).isObject().containsExactly(entry("initial", "initial"), entry("RQUi", "bob"));
     }
 
     private TreeContext getContext(JsonValue sharedState, PreferredLocales preferredLocales,

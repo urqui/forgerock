@@ -15,42 +15,32 @@
  */
 package org.kissi.urqui;
 
-import com.iplanet.sso.SSOException;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
+import static org.forgerock.openam.auth.node.api.SharedStateConstants.USERNAME;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import org.mockito.Mock;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-import java.util.Enumeration;
-import java.util.List;
-import java.util.ResourceBundle;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
+import com.iplanet.sso.SSOException;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdRepoException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.ExternalRequestContext.Builder;
 import org.forgerock.openam.auth.node.api.TreeContext;
-import org.forgerock.util.i18n.PreferredLocales;
+import org.forgerock.openam.core.CoreWrapper;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.forgerock.openam.core.CoreWrapper;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdRepoException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.mockito.InjectMocks;
-import static org.forgerock.openam.auth.node.api.SharedStateConstants.REALM;
-import static org.forgerock.openam.auth.node.api.SharedStateConstants.USERNAME;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 /**
  * A node which collects a password from the user via a password callback.
@@ -78,44 +68,27 @@ public class RQUiAttributeNodeTest {
     @BeforeMethod
     public void setup() throws Exception {
         node = null;
-
         initMocks(this);
         given(coreWrapper.convertRealmPathToRealmDn(any())).willReturn("org=name");
         given(coreWrapper.getAMIdentityRepository(any())).willReturn(identityRepository);
-        given(amIdentity.isActive()).willReturn(true);
         given(coreWrapper.getIdentity(eq("bob"), any())).willReturn(amIdentity);
         given(amIdentity.isActive()).willReturn(true);
-        given(config.rquiAttributeName()).willReturn("theconfigValueYouWant");
+        given(config.rquiAttributeName()).willReturn("theConfigValueYouWant");
 
     }
 
     @Test
-    public void testProcessWithCallbacksAddsToState() {
+    public void testProcess() throws IdRepoException, SSOException {
 
-        // node = new RQUiAttributeNode(config,coreWrapper);
         JsonValue sharedState = json(object(field(USERNAME, "bob")));
         JsonValue transientState = json(object(field("RQUi", "jonathan")));
 
         Action result = node.process(getContext(sharedState, transientState));
 
-        // assertThat(result.outcome).isEqualTo("true");
-        // assertThat(result.callbacks).isEmpty();
-        // assertThat(result.sharedState).isObject().containsExactly(entry(USERNAME, "bob"));
-        //assertThat(sharedState).isObject().containsExactly(entry(USERNAME, "bob"));
-        //assertThat(transientState).isObject().containsExactly(entry("RQUi", "jonathan"));
-        
         assertThat(result.callbacks).isEmpty();
         assertThat(sharedState).isObject().containsExactly(entry(USERNAME, "bob"));
         assertThat(transientState).isObject().containsExactly(entry("RQUi", "jonathan"));
-        
-        try {
-            verify(amIdentity, times(1)).store();
-        } catch (IdRepoException ex) {
-            Logger.getLogger(RQUiAttributeNodeTest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SSOException ex) {
-            Logger.getLogger(RQUiAttributeNodeTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+        verify(amIdentity, times(1)).store();
     }
 
     private TreeContext getContext(JsonValue sharedState, JsonValue transientState) {

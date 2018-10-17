@@ -60,7 +60,7 @@ public class URQUiCollectorNode extends SingleOutcomeNode {
                     logger.debug("URQUi has been collected and put in the shared state");
                     return goToNext()
                         .replaceSharedState(sharedState.copy())
-                        .replaceTransientState(transientState.copy().put("URQUI", password)).build();
+                        .replaceTransientState(transientState.copy().put("URQUi", password)).build();
                 })
                 .orElseGet(() -> {
                     logger.debug("collecting URQUi");

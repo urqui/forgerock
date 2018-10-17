@@ -24,6 +24,8 @@ import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+
+import java.util.Collections;
 import org.mockito.Mock;
 import static org.mockito.Matchers.eq;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -79,36 +81,42 @@ public class URQUiDecisionNodeTest {
     @BeforeMethod
     public void setup() throws Exception {
         node = null;
-
         initMocks(this);
         given(coreWrapper.convertRealmPathToRealmDn(any())).willReturn("org=name");
         given(coreWrapper.getAMIdentityRepository(any())).willReturn(identityRepository);
-        given(amIdentity.isActive()).willReturn(true);
         given(coreWrapper.getIdentity(eq("bob"), any())).willReturn(amIdentity);
         given(amIdentity.isActive()).willReturn(true);
+        given(amIdentity.getAttribute(any())).willReturn(Collections.singleton("RQUi"));
         given(config.rquiAttributeName()).willReturn("RQUi");
 
     }
 
     @Test
-    public void testProcessWithCallbacksAddsToState() throws NodeProcessException {
+    public void testProcessWithGoodURQUi() throws NodeProcessException {
 
         // node = new RQUiAttributeNode(config,coreWrapper);
         JsonValue sharedState = json(object(field(USERNAME, "bob")));
-        JsonValue transientState = json(object(field("URQUi", "123456")));
-
+        JsonValue transientState = json(object(field("URQUi", "GoodURQUi")));
         
         Action result = node.process(getContext(sharedState, transientState));
-        
-          assertThat(result.callbacks).isEmpty();
-        
-		
-      
+        assertThat(result.callbacks).isEmpty();
+        assertThat(result.outcome).isEqualTo("true");
         assertThat(sharedState).isObject().containsExactly(entry(USERNAME, "bob"));
-        assertThat(transientState).isObject().containsExactly(entry("URQUi", "123456"));
-        
-        
+        assertThat(transientState).isObject().containsExactly(entry("URQUi", "GoodURQUi"));
+    }
 
+    @Test
+    public void testProcessWithBadURQUi() throws NodeProcessException {
+
+        // node = new RQUiAttributeNode(config,coreWrapper);
+        JsonValue sharedState = json(object(field(USERNAME, "bob")));
+        JsonValue transientState = json(object(field("URQUi", "BadURQUi")));
+
+        Action result = node.process(getContext(sharedState, transientState));
+        assertThat(result.callbacks).isEmpty();
+        assertThat(result.outcome).isEqualTo("false");
+        assertThat(sharedState).isObject().containsExactly(entry(USERNAME, "bob"));
+        assertThat(transientState).isObject().containsExactly(entry("URQUi", "BadURQUi"));
     }
 
     private TreeContext getContext(JsonValue sharedState, JsonValue transientState) {
