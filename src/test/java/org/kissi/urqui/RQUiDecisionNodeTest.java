@@ -24,6 +24,8 @@ import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+
+import java.util.Collections;
 import org.mockito.Mock;
 import static org.mockito.Matchers.eq;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -38,6 +40,7 @@ import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.ExternalRequestContext.Builder;
 import org.forgerock.openam.auth.node.api.TreeContext;
 import org.forgerock.util.i18n.PreferredLocales;
+import org.restlet.engine.util.SetUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.forgerock.openam.core.CoreWrapper;
@@ -79,37 +82,41 @@ public class RQUiDecisionNodeTest {
     @BeforeMethod
     public void setup() throws Exception {
         node = null;
-
         initMocks(this);
         given(coreWrapper.convertRealmPathToRealmDn(any())).willReturn("org=name");
         given(coreWrapper.getAMIdentityRepository(any())).willReturn(identityRepository);
-        given(amIdentity.isActive()).willReturn(true);
         given(coreWrapper.getIdentity(eq("bob"), any())).willReturn(amIdentity);
         given(amIdentity.isActive()).willReturn(true);
-        given(config.rquiAttributeName()).willReturn("theconfigValueYouWant");
-
+        given(config.rquiAttributeName()).willReturn("theConfigValueYouWant");
     }
 
     @Test
-    public void testProcessWithCallbacksAddsToState() {
-
-        // node = new RQUiAttributeNode(config,coreWrapper);
+    public void testProcessWithNoRQUiAttributeReturned() throws NodeProcessException, IdRepoException, SSOException {
+        given(amIdentity.getAttribute(any())).willReturn(Collections.emptySet());
         JsonValue sharedState = json(object(field(USERNAME, "bob")));
         JsonValue transientState = json(object(field("RQUi", "jonathan")));
 
-         try {
-             Action result = node.process(getContext(sharedState, transientState));
-               assertThat(result.callbacks).isEmpty();
-        } catch (NodeProcessException ex) {
-            Logger.getLogger(RQUiAttributeNodeTest.class.getName()).log(Level.SEVERE, null, ex);
-        }  
-		
-      
+        Action result = node.process(getContext(sharedState, transientState));
+
+        assertThat(result.callbacks).isEmpty();
         assertThat(sharedState).isObject().containsExactly(entry(USERNAME, "bob"));
         assertThat(transientState).isObject().containsExactly(entry("RQUi", "jonathan"));
-        
-        
+        assertThat(result.outcome).isEqualTo("false");
+    }
 
+
+    @Test
+    public void testProcessWithRQUiAttributeReturned() throws NodeProcessException, IdRepoException, SSOException {
+        given(amIdentity.getAttribute(any())).willReturn(Collections.singleton("RQUiValue"));
+        JsonValue sharedState = json(object(field(USERNAME, "bob")));
+        JsonValue transientState = json(object(field("RQUi", "jonathan")));
+
+        Action result = node.process(getContext(sharedState, transientState));
+
+        assertThat(result.callbacks).isEmpty();
+        assertThat(sharedState).isObject().containsExactly(entry(USERNAME, "bob"));
+        assertThat(transientState).isObject().containsExactly(entry("RQUi", "jonathan"));
+        assertThat(result.outcome).isEqualTo("true");
     }
 
     private TreeContext getContext(JsonValue sharedState, JsonValue transientState) {

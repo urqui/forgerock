@@ -81,7 +81,7 @@ public class URQUiDecisionNode extends AbstractDecisionNode {
         logger.debug("URQUiDecisionNode started");
 
         String username = context.sharedState.get(USERNAME).asString();
-        String urqui = context.transientState.get("URQUI").asString();
+        String urqui = context.transientState.get("URQUi").asString();
         logger.debug("authenticating {} ", username);
         boolean isActive;
         Set<String> attrs;

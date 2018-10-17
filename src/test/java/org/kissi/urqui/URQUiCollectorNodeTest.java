@@ -50,17 +50,10 @@ import org.testng.annotations.Test;
 
 public class URQUiCollectorNodeTest   {
 
-    private URQUiCollectorNode node;
-
-    @BeforeMethod
-    public void before() {
-        initMocks(this);
-        node = new URQUiCollectorNode();
-    }
-
     @Test
     public void testProcessWithNoCallbacksReturnsASingleCallback() {
         // Given
+        URQUiCollectorNode node = new URQUiCollectorNode();
         JsonValue sharedState = json(object(field("initial", "initial")));
         PreferredLocales preferredLocales = mock(PreferredLocales.class);
         ResourceBundle resourceBundle = new MockResourceBundle("URQUi");
@@ -80,6 +73,7 @@ public class URQUiCollectorNodeTest   {
 
     @Test
     public void testProcessWithCallbacksAddsToState() {
+        URQUiCollectorNode node = new URQUiCollectorNode();
         JsonValue sharedState = json(object(field("initial", "initial")));
         PasswordCallback callback = new PasswordCallback("prompt", false);
         callback.setPassword("secret".toCharArray());
