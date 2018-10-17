@@ -46,6 +46,7 @@ import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.mockito.InjectMocks;
 import static org.forgerock.openam.auth.node.api.SharedStateConstants.REALM;
 import static org.forgerock.openam.auth.node.api.SharedStateConstants.USERNAME;
@@ -58,7 +59,7 @@ import static org.mockito.Mockito.verify;
  * <p>
  * Places the result in the shared state as 'password'.</p>
  */
-public class RQUiAttributeNodeTest {
+public class URQUiDecisionNodeTest {
 
     @Mock
     CoreWrapper coreWrapper;
@@ -67,10 +68,10 @@ public class RQUiAttributeNodeTest {
     AMIdentityRepository identityRepository;
 
     @Mock
-    RQUiAttributeNode.Config config;
+    URQUiDecisionNode.Config config;
 
     @InjectMocks
-    RQUiAttributeNode node;
+    URQUiDecisionNode node;
 
     @Mock
     AMIdentity amIdentity;
@@ -85,36 +86,28 @@ public class RQUiAttributeNodeTest {
         given(amIdentity.isActive()).willReturn(true);
         given(coreWrapper.getIdentity(eq("bob"), any())).willReturn(amIdentity);
         given(amIdentity.isActive()).willReturn(true);
-        given(config.rquiAttributeName()).willReturn("theconfigValueYouWant");
+        given(config.rquiAttributeName()).willReturn("RQUi");
 
     }
 
     @Test
-    public void testProcessWithCallbacksAddsToState() {
+    public void testProcessWithCallbacksAddsToState() throws NodeProcessException {
 
         // node = new RQUiAttributeNode(config,coreWrapper);
         JsonValue sharedState = json(object(field(USERNAME, "bob")));
-        JsonValue transientState = json(object(field("RQUi", "jonathan")));
+        JsonValue transientState = json(object(field("URQUi", "123456")));
 
+        
         Action result = node.process(getContext(sharedState, transientState));
-
-        // assertThat(result.outcome).isEqualTo("true");
-        // assertThat(result.callbacks).isEmpty();
-        // assertThat(result.sharedState).isObject().containsExactly(entry(USERNAME, "bob"));
-        //assertThat(sharedState).isObject().containsExactly(entry(USERNAME, "bob"));
-        //assertThat(transientState).isObject().containsExactly(entry("RQUi", "jonathan"));
         
-        assertThat(result.callbacks).isEmpty();
+          assertThat(result.callbacks).isEmpty();
+        
+		
+      
         assertThat(sharedState).isObject().containsExactly(entry(USERNAME, "bob"));
-        assertThat(transientState).isObject().containsExactly(entry("RQUi", "jonathan"));
+        assertThat(transientState).isObject().containsExactly(entry("URQUi", "123456"));
         
-        try {
-            verify(amIdentity, times(1)).store();
-        } catch (IdRepoException ex) {
-            Logger.getLogger(RQUiAttributeNodeTest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SSOException ex) {
-            Logger.getLogger(RQUiAttributeNodeTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
 
     }
 
