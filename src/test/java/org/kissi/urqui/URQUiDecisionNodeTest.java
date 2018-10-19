@@ -46,8 +46,11 @@ import org.forgerock.openam.core.CoreWrapper;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.HttpsURLConnection;
 import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.mockito.InjectMocks;
 import static org.forgerock.openam.auth.node.api.SharedStateConstants.REALM;
@@ -77,11 +80,21 @@ public class URQUiDecisionNodeTest {
 
     @Mock
     AMIdentity amIdentity;
+	
+    @Mock
+    HttpsURLConnection con;
 
     @BeforeMethod
     public void setup() throws Exception {
         node = null;
         initMocks(this);
+	 
+        String mystr = "jonathan123456ok";
+        InputStream stream = new ByteArrayInputStream(mystr.getBytes());
+        
+	given(node.getHttpsURLConnection("https://validate.urqui.net")).willReturn(con);
+         
+        given(con.getInputStream()).willReturn(stream);
         given(coreWrapper.convertRealmPathToRealmDn(any())).willReturn("org=name");
         given(coreWrapper.getAMIdentityRepository(any())).willReturn(identityRepository);
         given(coreWrapper.getIdentity(eq("bob"), any())).willReturn(amIdentity);

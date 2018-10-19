@@ -81,7 +81,7 @@ public class URQUiCollectorNodeTest   {
         assertThat(result.outcome).isEqualTo("outcome");
         assertThat(result.callbacks).isEmpty();
         assertThat(result.sharedState).isObject().contains("initial", "initial");
-        assertThat(result.transientState).isObject().contains("URQUI", "secret");
+        assertThat(result.transientState).isObject().contains("URQUi", "secret");
         assertThat(sharedState).isObject().containsExactly(entry("initial", "initial"));
     }
 
