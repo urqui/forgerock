@@ -92,8 +92,8 @@ public class URQUiDecisionNodeTest {
         String mystr = "jonathan123456ok";
         InputStream stream = new ByteArrayInputStream(mystr.getBytes());
         
-	given(node.getHttpsURLConnection("https://validate.urqui.net")).willReturn(con);
-         
+	//given(node.getHttpsURLConnection(eq("https://validate.urqui.net"))).willReturn(con);
+         given(node.getHttpsURLConnection(any())).willReturn(con);
         given(con.getInputStream()).willReturn(stream);
         given(coreWrapper.convertRealmPathToRealmDn(any())).willReturn("org=name");
         given(coreWrapper.getAMIdentityRepository(any())).willReturn(identityRepository);
