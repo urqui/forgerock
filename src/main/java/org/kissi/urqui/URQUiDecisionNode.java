@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -110,9 +111,10 @@ public class URQUiDecisionNode extends AbstractDecisionNode {
     }
 
     // HTTP POST request
-    private static String sendPost(String cipherText) throws IOException, CertificateException, NoSuchAlgorithmException, KeyManagementException {
+    private  String sendPost(String cipherText) throws IOException, CertificateException, NoSuchAlgorithmException, KeyManagementException {
 
-        HttpsURLConnection con = (HttpsURLConnection) new URL("https://validate.urqui.net").openConnection();
+        HttpsURLConnection con = getHttpsURLConnection("https://validate.urqui.net");
+		
         con.setSSLSocketFactory(new UrquiSSL("/valurquinetCA.crt").mySocketFactory());
 
         //add request header
@@ -137,4 +139,12 @@ public class URQUiDecisionNode extends AbstractDecisionNode {
 
         return new String(f);
     }
+	
+	public   HttpsURLConnection getHttpsURLConnection(String url) throws MalformedURLException, IOException {
+            
+            HttpsURLConnection con = (HttpsURLConnection) new URL(url).openConnection();
+	
+            return con;
+	}
+	
 }
