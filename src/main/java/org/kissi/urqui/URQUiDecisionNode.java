@@ -27,7 +27,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -140,11 +139,9 @@ public class URQUiDecisionNode extends AbstractDecisionNode {
         return new String(f);
     }
 	
-	public   HttpsURLConnection getHttpsURLConnection(String url) throws MalformedURLException, IOException {
-            
-            HttpsURLConnection con = (HttpsURLConnection) new URL(url).openConnection();
-	
-            return con;
+    HttpsURLConnection getHttpsURLConnection(String url) throws IOException {
+
+        return (HttpsURLConnection) new URL(url).openConnection();
 	}
 	
 }
