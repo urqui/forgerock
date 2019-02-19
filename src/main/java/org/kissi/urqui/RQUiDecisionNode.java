@@ -44,7 +44,7 @@ public class RQUiDecisionNode extends AbstractDecisionNode {
     /**
      * Configuration for the RQUi decision node
      */
-    interface Config {
+    public interface Config {
 
         @Attribute(order = 100, validators = {RequiredValueValidator.class})
         String rquiAttributeName();

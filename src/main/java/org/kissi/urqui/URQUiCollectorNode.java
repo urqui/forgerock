@@ -20,7 +20,6 @@ import static org.forgerock.openam.auth.node.api.Action.send;
 
 import java.util.ResourceBundle;
 import javax.security.auth.callback.PasswordCallback;
-import org.forgerock.guava.common.base.Strings;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
@@ -28,6 +27,8 @@ import org.forgerock.openam.auth.node.api.SingleOutcomeNode;
 import org.forgerock.openam.auth.node.api.TreeContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
 
 /**
  * A node which collects a password from the user via a password callback.
@@ -41,7 +42,7 @@ public class URQUiCollectorNode extends SingleOutcomeNode {
     /**
      * Configuration for the password collector node.
      */
-    interface Config {
+    public interface Config {
     }
 
     private static final String BUNDLE = "org/kissi/urqui/URQUiCollectorNode";
