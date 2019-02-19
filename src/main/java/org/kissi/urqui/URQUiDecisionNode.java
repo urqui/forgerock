@@ -54,7 +54,7 @@ public class URQUiDecisionNode extends AbstractDecisionNode {
     /**
      * Configuration for the data store node.
      */
-    interface Config {
+    public interface Config {
 
         @Attribute(order = 100, validators = {RequiredValueValidator.class})
         String rquiAttributeName();

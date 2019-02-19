@@ -18,13 +18,13 @@ package org.kissi.urqui;
 
 import static org.forgerock.openam.auth.node.api.Action.send;
 
+import com.google.common.base.Strings;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 
 import javax.security.auth.callback.NameCallback;
 
-import org.forgerock.guava.common.base.Strings;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
@@ -45,7 +45,7 @@ public class RQUiCollectorNode extends SingleOutcomeNode {
     /**
      * Configuration for the RQUi collector node.
      */
-    interface Config {
+    public interface Config {
     }
 
     private static final String BUNDLE = "org/kissi/urqui/RQUiCollectorNode";
